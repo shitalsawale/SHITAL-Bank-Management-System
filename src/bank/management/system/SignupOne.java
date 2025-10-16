@@ -266,7 +266,7 @@ public class SignupOne extends JFrame implements ActionListener {
             } else {
                 try {
                     // Save data to database
-                    conn c1 = new conn();
+                    Conn c1 = new Conn();
                     String query = "INSERT INTO signup VALUES('" + formno + "', '" + name + "', '" + fname + "', '" + dob + "', '" + gender + "', '" + email + "', '" + marital + "', '" + address + "', '" + city + "', '" + state + "', '" + pincode + "')";
                     c1.s.executeUpdate(query);
 
