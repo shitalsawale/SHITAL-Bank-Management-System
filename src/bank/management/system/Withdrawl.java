@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Date;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 
 public class Withdrawl extends JFrame implements ActionListener {
 
@@ -60,16 +61,19 @@ public class Withdrawl extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource() == withdraw) {
             String number = amount.getText();
-            Date date = new Date();
+
+            // ✅ Properly format date for MySQL
+            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
             if (number.equals("")) {
                 JOptionPane.showMessageDialog(null, "Please enter the amount you want to withdraw");
             } else {
                 try {
                     Conn conn = new Conn();
 
-                    // Check balance first
+                    // ✅ Check balance first
                     int balance = 0;
-                    ResultSet rs = conn.s.executeQuery("select * from bank where pin = '" + pinnumber + "'");
+                    ResultSet rs = conn.s.executeQuery("SELECT * FROM bank WHERE pin = '" + pinnumber + "'");
                     while (rs.next()) {
                         if (rs.getString("type").equals("Deposit")) {
                             balance += Integer.parseInt(rs.getString("amount"));
@@ -84,8 +88,8 @@ public class Withdrawl extends JFrame implements ActionListener {
                         return;
                     }
 
-                    // Insert withdrawal record
-                    String query = "insert into bank values('" + pinnumber + "', '" + date + "', 'Withdraw', '" + number + "')";
+                    // ✅ Insert withdrawal record with formatted date
+                    String query = "INSERT INTO bank (pin, date, type, amount) VALUES ('" + pinnumber + "', '" + date + "', 'Withdraw', '" + number + "')";
                     conn.s.executeUpdate(query);
 
                     JOptionPane.showMessageDialog(null, "Rs. " + number + " Withdrawn Successfully");

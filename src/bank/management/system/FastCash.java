@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Date;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 
 public class FastCash extends JFrame implements ActionListener {
 
@@ -30,6 +31,7 @@ public class FastCash extends JFrame implements ActionListener {
         text.setBounds(250, 300, 400, 20);
         image.add(text);
 
+        // Buttons
         r100 = createButton("Rs 100", 170, 350);
         r500 = createButton("Rs 500", 355, 350);
         r1000 = createButton("Rs 1000", 170, 400);
@@ -76,10 +78,12 @@ public class FastCash extends JFrame implements ActionListener {
                 Conn conn = new Conn();
 
                 int balance = 0;
-                ResultSet rs = conn.s.executeQuery("select * from bank where pin = '" + pinnumber + "'");
+                ResultSet rs = conn.s.executeQuery("SELECT * FROM bank WHERE pin = '" + pinnumber + "'");
                 while (rs.next()) {
-                    if (rs.getString("type").equals("Deposit")) balance += Integer.parseInt(rs.getString("amount"));
-                    else balance -= Integer.parseInt(rs.getString("amount"));
+                    if (rs.getString("type").equals("Deposit"))
+                        balance += Integer.parseInt(rs.getString("amount"));
+                    else
+                        balance -= Integer.parseInt(rs.getString("amount"));
                 }
 
                 if (amount > balance) {
@@ -87,8 +91,11 @@ public class FastCash extends JFrame implements ActionListener {
                     return;
                 }
 
-                Date date = new Date();
-                String query = "insert into bank values('" + pinnumber + "', '" + date + "', 'Withdraw', '" + amount + "')";
+                // ✅ Format date properly for MySQL
+                String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
+                // ✅ Use explicit column names
+                String query = "INSERT INTO bank (pin, date, type, amount) VALUES ('" + pinnumber + "', '" + date + "', 'Withdraw', '" + amount + "')";
                 conn.s.executeUpdate(query);
 
                 JOptionPane.showMessageDialog(null, "Rs " + amount + " Debited Successfully");

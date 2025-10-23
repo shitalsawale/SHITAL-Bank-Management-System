@@ -56,8 +56,8 @@ public class PinChange extends JFrame implements ActionListener {
 
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource() == change) {
-            String newPin = pinField.getText();
-            String rePin = repinField.getText();
+            String newPin = new String(pinField.getPassword());
+            String rePin = new String(repinField.getPassword());
 
             if (!newPin.equals(rePin)) {
                 JOptionPane.showMessageDialog(null, "Entered PINs do not match");
@@ -66,8 +66,12 @@ public class PinChange extends JFrame implements ActionListener {
 
             try {
                 Conn conn = new Conn();
-                String query1 = "update login set pinNumber = '" + newPin + "' where pinNumber = '" + pinnumber + "'";
-                String query2 = "update bank set pin = '" + newPin + "' where pin = '" + pinnumber + "'";
+
+                // Update login table
+                String query1 = "UPDATE login SET pin = '" + newPin + "' WHERE pin = '" + pinnumber + "'";
+                // Update bank table
+                String query2 = "UPDATE bank SET pin = '" + newPin + "' WHERE pin = '" + pinnumber + "'";
+
                 conn.s.executeUpdate(query1);
                 conn.s.executeUpdate(query2);
 

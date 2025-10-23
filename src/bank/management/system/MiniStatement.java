@@ -3,6 +3,7 @@ package bank.management.system;
 import javax.swing.*;
 import java.awt.*;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 
 public class MiniStatement extends JFrame {
 
@@ -17,23 +18,35 @@ public class MiniStatement extends JFrame {
 
         JTextArea area = new JTextArea();
         area.setBounds(20, 50, 400, 400);
+        area.setEditable(false);
         add(area);
 
         try {
             Conn conn = new Conn();
-            ResultSet rs = conn.s.executeQuery("select * from bank where pin = '" + pinnumber + "'");
+            // Fetch transactions for this PIN
+            ResultSet rs = conn.s.executeQuery("SELECT * FROM bank WHERE pin = '" + pinnumber + "' ORDER BY date ASC");
 
             int balance = 0;
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
             while (rs.next()) {
-                area.append(rs.getString("date") + "\t" + rs.getString("type") + "\t" + rs.getString("amount") + "\n");
-                if (rs.getString("type").equals("Deposit")) balance += Integer.parseInt(rs.getString("amount"));
-                else balance -= Integer.parseInt(rs.getString("amount"));
+                Timestamp timestamp = rs.getTimestamp("date"); // Ensure correct type
+                String type = rs.getString("type");
+                int amount = rs.getInt("amount");
+
+                String dateStr = (timestamp != null) ? sdf.format(timestamp) : "N/A";
+
+                area.append(dateStr + "\t" + type + "\t" + amount + "\n");
+
+                if (type.equals("Deposit")) balance += amount;
+                else balance -= amount;
             }
 
             area.append("\nCurrent Balance: Rs " + balance);
 
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error fetching mini statement: " + e.getMessage());
         }
 
         setSize(450, 600);

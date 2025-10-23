@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Deposit extends JFrame implements ActionListener {
@@ -60,17 +61,23 @@ public class Deposit extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent ae) {
         if (ae.getSource() == deposit) {
             String number = amount.getText();
-            Date date = new Date();
+
+            // ✅ Format date properly for MySQL
+            String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+
             if (number.equals("")) {
                 JOptionPane.showMessageDialog(null, "Please enter the amount you want to deposit");
             } else {
                 try {
                     Conn conn = new Conn();
-                    String query = "insert into bank values('" + pinnumber + "', '" + date + "', 'Deposit', '" + number + "')";
+                    // ✅ Correct date format for MySQL
+                    String query = "INSERT INTO bank (pin, date, type, amount) VALUES ('" + pinnumber + "', '" + date + "', 'Deposit', '" + number + "')";
                     conn.s.executeUpdate(query);
+
                     JOptionPane.showMessageDialog(null, "Rs. " + number + " Deposited Successfully");
                     setVisible(false);
                     new Transactions(pinnumber).setVisible(true);
+
                 } catch (Exception e) {
                     System.out.println(e);
                 }
